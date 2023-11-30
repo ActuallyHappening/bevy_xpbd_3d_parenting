@@ -60,7 +60,7 @@ fn apply_internal_forces(
 				let internal_force = internal_quat.mul_vec3(internal_force.0);
 				let internal_point = parent_child_transform.translation;
 
-				parents_force.apply_force_at_point(internal_force, internal_point, center_of_mass.inner());
+				parents_force.apply_force_at_point(internal_force, internal_point, center_of_mass.0);
 			}
 		} else {
 			warn!("Collider parent points to a non-RigidBody entity");
