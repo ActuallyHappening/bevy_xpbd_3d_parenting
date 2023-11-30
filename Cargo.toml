@@ -12,7 +12,7 @@ categories = ["game-development", "science", "simulation"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy_xpbd_3d = { git = "https://github.com/ActuallyHappening/bevy_xpbd.git" }
+bevy_xpbd_3d = { git = "https://github.com/Jondolf/bevy_xpbd.git" }
 serde = { version = "1.0.192", features = ["derive"] }
 
 [dependencies.bevy]
