@@ -87,10 +87,10 @@ fn helper_warnings(
         match (collider_parent, rigid_body, external_force) {
 			(_, _, true) => warn!("Adding [InternalForce] on the same entity as an [ExternalForce] component will be ignored"),
 			(false, true, _) => warn!("Adding [InternalForce] component to an entity with [RigidBody] will be ignored."),
-			(true, true, _) => warn!("Adding [InternalForce] component to an entity that is a Rigid body and\
+			(true, true, _) => warn!("Adding [InternalForce] component to an entity that is a Rigid body and \
 			 a child of another rigid body (i.e. has the [ColliderParent] component) will be ignored"),
 			 (true, false, _) => { /* This is actually what we want */},
-			 (false, false, _) => warn!("Adding [InternalForce] component to an entity that is not a child of a [RigidBody] is\
+			 (false, false, _) => warn!("Adding [InternalForce] component to an entity that is not a child of a [RigidBody] is \
 			 pointless, as [InternalForce] applied forces only to parents"),
 		}
     }
