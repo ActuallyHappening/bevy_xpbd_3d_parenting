@@ -10,7 +10,7 @@ impl Plugin for PhysicsParentingPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             PhysicsSchedule,
-            (apply_internal_forces, helper_warnings)
+            (apply_internal_forces, #[cfg(feature = "debug")] helper_warnings)
                 .after(bevy_xpbd_3d::PhysicsStepSet::SpatialQuery)
                 .after(clear_forces_and_impulses),
         )
@@ -77,6 +77,7 @@ fn apply_internal_forces(
     }
 }
 
+#[cfg(feature = "debug")]
 fn helper_warnings(
     possible_children: Query<
         (Has<ColliderParent>, Has<RigidBody>, Has<ExternalForce>),
