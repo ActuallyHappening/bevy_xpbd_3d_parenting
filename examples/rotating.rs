@@ -14,7 +14,7 @@ fn main() {
         .add_plugins((
             DefaultPlugins,
             PhysicsPlugins::default(),
-            bevy_xpbd3d_parenting::PhysicsParentingPlugin,
+            bevy_xpbd3d_parenting::PhysicsParentingPlugin::default(),
         ))
         .add_systems(Startup, setup)
         .run();

@@ -1,10 +1,17 @@
 #![allow(clippy::type_complexity)]
+#[doc = include_str!("../README.md")]
 
 use bevy::prelude::*;
 use bevy_xpbd_3d::{plugins::integrator::clear_forces_and_impulses, prelude::*, PhysicsSchedule};
 use serde::{Deserialize, Serialize};
 
-pub struct PhysicsParentingPlugin;
+pub mod prelude {
+	// pub use bevy_xpbd_3d::prelude::*;
+	pub use crate::{PhysicsParentingPlugin, InternalForce};
+}
+
+#[derive(Debug, Default)]
+pub struct PhysicsParentingPlugin {}
 
 impl Plugin for PhysicsParentingPlugin {
     fn build(&self, app: &mut App) {
