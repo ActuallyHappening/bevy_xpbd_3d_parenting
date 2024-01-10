@@ -15,10 +15,21 @@ categories = ["game-development", "science", "simulation"]
 debug = []
 
 [dependencies]
-bevy_xpbd_3d = { git = "https://github.com/Jondolf/bevy_xpbd.git" }
 serde = { version = "1.0.192", features = ["derive"] }
 
 [dependencies.bevy]
 version = "0.12"
 # default-features = false
 # features = ["bevy_render"]
+
+[dependencies.bevy_xpbd_3d]
+git = "https://github.com/Jondolf/bevy_xpbd.git"
+default-features = false
+features = ["3d", "f32", "debug-plugin", "parallel"]
+
+[[example]]
+name = "rotating"
+required-features = ["bevy_xpbd_3d/async-collider"]
+
+[dev-dependencies]
+test-log = { version = "0.2.14", features = ["tracing-subscriber", "trace"] }
