@@ -7,5 +7,6 @@
 !README.md
 !src
 !.gitignore
+!.rustfmt.toml
 !examples
 !tests
