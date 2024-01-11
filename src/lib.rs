@@ -39,6 +39,10 @@ impl InternalForce {
         self.0
     }
 
+		pub fn into_inner(self) -> Vec3 {
+			self.0
+		}
+
     pub fn set(&mut self, value: Vec3) {
         self.0 = value;
     }
