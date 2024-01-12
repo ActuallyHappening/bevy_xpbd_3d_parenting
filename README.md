@@ -6,7 +6,7 @@ Currently not published on crates.io because it relies on unreleased aspects of 
 ```toml
 # Use the latest git release of bevy_xpbd3d_parenting
 [dependencies.bevy_xpbd3d_parenting]
-git = "https://github.com/ActuallyHappening/creativity-game.git"
+git = "https://github.com/ActuallyHappening/bevy_xpbd3d_parenting.git"
 default-features = false
 
 # bevy_xpbd3d_parenting relies on unreleased aspects of bevy_xpbd at the moment
