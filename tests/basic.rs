@@ -1,7 +1,9 @@
-use bevy::{prelude::*, render::RenderPlugin, winit::WinitPlugin};
+use bevy::{
+	log::{Level, LogPlugin},
+	prelude::*,
+};
 use bevy_xpbd3d_parenting::prelude::*;
 pub use bevy_xpbd_3d::prelude::*;
-use test_log::test;
 
 #[test]
 fn assert_moves() {
@@ -10,11 +12,17 @@ fn assert_moves() {
 	// initialize plugins
 	app.add_plugins((
 		MinimalPlugins,
+		LogPlugin {
+			// basic is name of integration test
+			filter: "basic=trace,bevy_xpbd3d_parenting=trace".into(),
+			level: Level::INFO,
+		},
 		// bevy xpbd
 		bevy_xpbd_3d::prelude::PhysicsPlugins::new(Update),
 		// custom plugin, does not technically depend on bevy_xpbd_3d
-		// but it makes sense to add afterwards
-		bevy_xpbd3d_parenting::PhysicsParentingPlugin::default(),
+		// but it makes sense to add afterwards.
+		// Also, the schedule must be the same as the one used for bevy_xpbd_3d
+		bevy_xpbd3d_parenting::ParentingPlugin::new(Update),
 	));
 
 	// spawn parent (example)
@@ -47,9 +55,19 @@ fn assert_moves() {
 	});
 	let parent = parent.id();
 
+	{
+		let parent_transform = app.world.get::<Transform>(parent).unwrap();
+		trace!("Parent transform before physics: {:?}", parent_transform);
+		assert!(parent_transform.translation.y == 0.0);
+	}
+
 	app.world.run_schedule(Main);
 
 	assert!(child.is_some());
 
-	assert!(app.world.get::<Transform>(parent).unwrap().translation.y > 0.0);
+	{
+		let parent_transform = app.world.get::<Transform>(parent).unwrap();
+		debug!("Parent transform after physics: {:?}", parent_transform);
+		assert!(parent_transform.translation.y > 0.0);
+	}
 }

@@ -23,7 +23,8 @@ version = "0.12"
 # features = ["bevy_render"]
 
 [dependencies.bevy_xpbd_3d]
-git = "https://github.com/Jondolf/bevy_xpbd.git"
+version = "0.3.3"
+# git = "https://github.com/Jondolf/bevy_xpbd.git"
 default-features = false
 features = ["3d", "f32", "debug-plugin", "parallel"]
 
