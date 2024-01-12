@@ -47,8 +47,8 @@ impl Plugin for ParentingPlugin {
 				self.bevy_xpbd_schedule,
 				(
 					apply_internal_forces,
-					#[cfg(feature = "debug")]
-					helper_warnings,
+					// #[cfg(feature = "debug")]
+					// helper_warnings,
 				)
 					.after(PhysicsSet::Prepare)
 					.before(PhysicsSet::StepSimulation),
@@ -89,7 +89,7 @@ impl InternalForce {
 fn apply_internal_forces(
 	mut parents: Query<(&mut ExternalForce, &CenterOfMass, &GlobalTransform), With<RigidBody>>,
 	children: Query<
-		(&ColliderParent, &InternalForce, &GlobalTransform),
+		(&Parent, &InternalForce, &GlobalTransform),
 		(Without<RigidBody>, Without<ExternalForce>),
 	>,
 ) {
@@ -104,45 +104,23 @@ fn apply_internal_forces(
 				let parent_child_transform = child_global_transform.reparented_to(parent_global_transform);
 
 				if parent_child_transform.scale.round() != Vec3::splat(1.) {
-					warn!("Scaling is not yet supported for `InternalForce` components. PRs welcome! Offending transform: {:?}", parent_child_transform);
+					debug!("Scaling is not yet supported for `InternalForce` components. PRs welcome! Offending transform: {:?}", parent_child_transform);
 				}
 
 				let internal_quat = parent_child_transform.rotation;
 				let internal_force = internal_quat.mul_vec3(internal_force.0);
 				let internal_point = parent_child_transform.translation;
 
+				#[cfg(feature = "debug")]
+				let previous_parents_force = *parents_force;
+
 				parents_force.apply_force_at_point(internal_force, internal_point, center_of_mass.0);
+
+				#[cfg(feature = "debug")]
+				debug!("Applying internal force {:?} at point {:?} on existing force: previous= {:#?}, final= {:#?}", internal_force, internal_point, previous_parents_force, parents_force);
 			}
 		} else {
 			warn!("Collider parent points to a non-RigidBody entity");
 		};
-	}
-}
-
-#[cfg(feature = "debug")]
-fn helper_warnings(
-	possible_children: Query<
-		(Has<ColliderParent>, Has<RigidBody>, Has<ExternalForce>),
-		With<InternalForce>,
-	>,
-) {
-	for (collider_parent, rigid_body, external_force) in possible_children.iter() {
-		match (collider_parent, rigid_body, external_force) {
-			(_, _, true) => warn!(
-				"Adding [InternalForce] on the same entity as an [ExternalForce] component will be ignored"
-			),
-			(false, true, _) => {
-				warn!("Adding [InternalForce] component to an entity with [RigidBody] will be ignored.")
-			}
-			(true, true, _) => warn!(
-				"Adding [InternalForce] component to an entity that is a Rigid body and \
-			 a child of another rigid body (i.e. has the [ColliderParent] component) will be ignored"
-			),
-			(true, false, _) => { /* This is actually what we want */ }
-			(false, false, _) => warn!(
-				"Adding [InternalForce] component to an entity that is not a child of a [RigidBody] is \
-			 pointless, as [InternalForce] applied forces only to parents"
-			),
-		}
 	}
 }

@@ -6,7 +6,7 @@ use bevy_xpbd3d_parenting::prelude::*;
 pub use bevy_xpbd_3d::prelude::*;
 
 #[test]
-fn assert_moves() {
+fn assert_moves_up() {
 	let mut app = App::new();
 
 	// initialize plugins
@@ -39,31 +39,32 @@ fn assert_moves() {
 		// which is used to compute mass and center of gravity
 		Collider::capsule(1.0, 1.0),
 	));
-	let mut child = None;
 	parent.with_children(|parent| {
-		child = Some(
-			parent
-				.spawn((
-					PbrBundle {
-						// add your own things here
-						..default()
-					},
-					InternalForce(Vec3::new(0., 3., 0.)),
-				))
-				.id(),
-		);
+		parent.spawn((
+			PbrBundle {
+				// add your own things here
+				..default()
+			},
+			// rather high because this only applies for one frame
+			InternalForce(Vec3::new(0., 300.0, 0.)),
+		));
 	});
+
 	let parent = parent.id();
+	// let child;
 
 	{
 		let parent_transform = app.world.get::<Transform>(parent).unwrap();
 		trace!("Parent transform before physics: {:?}", parent_transform);
 		assert!(parent_transform.translation.y == 0.0);
+
+		let parent_children = app.world.get::<Children>(parent).unwrap();
+		trace!("Parent children before physics: {:?}", parent_children);
+		assert!(parent_children.len() == 1);
+		// child = parent_children[0];
 	}
 
-	app.world.run_schedule(Main);
-
-	assert!(child.is_some());
+	app.update();
 
 	{
 		let parent_transform = app.world.get::<Transform>(parent).unwrap();
