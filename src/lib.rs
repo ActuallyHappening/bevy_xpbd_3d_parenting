@@ -24,13 +24,13 @@ impl ParentingPlugin {
 	/// ```rust
 	/// use bevy::prelude::*;
 	///
-	///#let mut app = App::new();
+	/// # let mut app = App::new();
 	///
 	/// let physics_schedule = Update; // or FixedUpdate, see bevy_xpbd docs
 	/// app.add_plugins((
 	///   MinimalPlugins,
-	///   bevy_xpbd_3d::PhysicsPlugins::new(physics_schedule),
-	///   bevy_xpbd3d_parenting::ParentingPlugin::new(physics_schedule),
+	///   bevy_xpbd_3d::prelude::PhysicsPlugins::new(physics_schedule.clone()),
+	///   bevy_xpbd3d_parenting::prelude::ParentingPlugin::new(physics_schedule),
 	/// ));
 	/// ````
 	pub fn new(bevy_xpbd_schedule: impl ScheduleLabel) -> Self {

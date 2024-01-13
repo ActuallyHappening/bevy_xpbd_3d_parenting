@@ -13,8 +13,8 @@ fn main() {
 	App::new()
 		.add_plugins((
 			DefaultPlugins,
-			PhysicsPlugins::default(),
-			bevy_xpbd3d_parenting::ParentingPlugin::default(),
+			PhysicsPlugins::new(Update),
+			bevy_xpbd3d_parenting::prelude::ParentingPlugin::new(Update),
 		))
 		.add_systems(Startup, setup)
 		.run();

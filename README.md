@@ -10,5 +10,8 @@ git = "https://github.com/ActuallyHappening/bevy_xpbd3d_parenting.git"
 default-features = false
 ```
 
-## Usage
-See example
+## Usage examples
+Run:
+```sh
+cargo r --example rotating --features bevy_xpbd_3d/async-collider
+```

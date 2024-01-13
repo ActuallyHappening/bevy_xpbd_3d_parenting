@@ -10,12 +10,13 @@ fn assert_moves_up() {
 	let mut app = App::new();
 
 	// initialize plugins
+	let level = "info";
 	app.add_plugins((
 		MinimalPlugins,
 		LogPlugin {
 			// basic is name of integration test
-			filter: "basic=trace,bevy_xpbd3d_parenting=trace".into(),
-			level: Level::DEBUG,
+			filter: format!("basic={level},bevy_xpbd3d_parenting={level}", level = level),
+			level: Level::INFO,
 		},
 		// bevy xpbd
 		bevy_xpbd_3d::prelude::PhysicsPlugins::new(Update),
