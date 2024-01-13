@@ -1070,16 +1070,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_xpbd3d_parenting"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "bevy_xpbd_3d",
- "serde",
- "test-log",
-]
-
-[[package]]
 name = "bevy_xpbd_3d"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1095,6 +1085,16 @@ dependencies = [
  "nalgebra",
  "parry3d",
  "parry3d-f64",
+]
+
+[[package]]
+name = "bevy_xpbd_3d_parenting"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_xpbd_3d",
+ "serde",
+ "test-log",
 ]
 
 [[package]]

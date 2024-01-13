@@ -1,11 +1,11 @@
 [package]
-name = "bevy_xpbd3d_parenting"
+name = "bevy_xpbd_3d_parenting"
 description = "Allows children of a `bevy_xpbd_3d` `RigidBody` to exert forces on their parents"
 version = "0.1.0"
 edition = "2021"
 authors = ["actuallyhappening <actuallyhappening42@gmail.com"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/ActuallyHappening/bevy_xpbd3d_parenting"
+repository = "https://github.com/ActuallyHappening/bevy_xpbd_3d_parenting"
 keywords = ["gamedev", "physics", "simulation", "xpbd", "bevy"]
 categories = ["game-development", "science", "simulation"]
 

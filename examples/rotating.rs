@@ -6,15 +6,15 @@
 //! Note also that this system is not balanced as is clearly seen, so center of mass is taken into account
 
 use bevy::prelude::*;
-use bevy_xpbd3d_parenting::InternalForce;
 use bevy_xpbd_3d::prelude::*;
+use bevy_xpbd_3d_parenting::InternalForce;
 
 fn main() {
 	App::new()
 		.add_plugins((
 			DefaultPlugins,
 			PhysicsPlugins::new(Update),
-			bevy_xpbd3d_parenting::prelude::ParentingPlugin::new(Update),
+			bevy_xpbd_3d_parenting::prelude::ParentingPlugin::new(Update),
 		))
 		.add_systems(Startup, setup)
 		.run();

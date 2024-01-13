@@ -2,8 +2,8 @@ use bevy::{
 	log::{Level, LogPlugin},
 	prelude::*,
 };
-use bevy_xpbd3d_parenting::prelude::*;
 pub use bevy_xpbd_3d::prelude::*;
+use bevy_xpbd_3d_parenting::prelude::*;
 
 #[test]
 fn assert_moves_up() {
@@ -15,7 +15,10 @@ fn assert_moves_up() {
 		MinimalPlugins,
 		LogPlugin {
 			// basic is name of integration test
-			filter: format!("basic={level},bevy_xpbd3d_parenting={level}", level = level),
+			filter: format!(
+				"basic={level},bevy_xpbd_3d_parenting={level}",
+				level = level
+			),
 			level: Level::INFO,
 		},
 		// bevy xpbd
@@ -23,7 +26,7 @@ fn assert_moves_up() {
 		// custom plugin, does not technically depend on bevy_xpbd_3d
 		// but it makes sense to add afterwards.
 		// Also, the schedule must be the same as the one used for bevy_xpbd_3d
-		bevy_xpbd3d_parenting::ParentingPlugin::new(Update),
+		bevy_xpbd_3d_parenting::ParentingPlugin::new(Update),
 	));
 
 	// spawn parent (example)

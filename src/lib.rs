@@ -30,7 +30,7 @@ impl ParentingPlugin {
 	/// app.add_plugins((
 	///   MinimalPlugins,
 	///   bevy_xpbd_3d::prelude::PhysicsPlugins::new(physics_schedule.clone()),
-	///   bevy_xpbd3d_parenting::prelude::ParentingPlugin::new(physics_schedule),
+	///   bevy_xpbd_3d_parenting::prelude::ParentingPlugin::new(physics_schedule),
 	/// ));
 	/// ````
 	pub fn new(bevy_xpbd_schedule: impl ScheduleLabel) -> Self {
