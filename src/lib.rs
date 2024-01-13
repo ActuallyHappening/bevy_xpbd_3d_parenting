@@ -98,14 +98,10 @@ fn apply_internal_forces(
 			parents.get_mut(collider_parent.get())
 		{
 			if parents_force.persistent {
-				warn!("A child entity (with an InternalForce but no RigidBody) is a (ColliderParent) parent of a RigidBody entity with a persistent ExternalForce. \
-								This is not supported, as child entities in this format continuously update their parent's ExternalForce component, therefor making the parent's ExternalForce not persistent!");
+				warn!("A child entity (with an `InternalForce` but no `RigidBody`) is a child of a RigidBody entity with a persistent ExternalForce. \
+								This is not supported, as child entities' `ExternalForce` is updated every (physics) frame by the `ParentingPlugin`");
 			} else {
 				let parent_child_transform = child_global_transform.reparented_to(parent_global_transform);
-
-				if parent_child_transform.scale.round() != Vec3::splat(1.) {
-					debug!("Scaling is not yet supported for `InternalForce` components. PRs welcome! Offending transform: {:?}", parent_child_transform);
-				}
 
 				let internal_quat = parent_child_transform.rotation;
 				let internal_force = internal_quat.mul_vec3(internal_force.0);
@@ -114,13 +110,14 @@ fn apply_internal_forces(
 				#[cfg(feature = "debug")]
 				let previous_parents_force = *parents_force;
 
+				// the meat of the whole library
 				parents_force.apply_force_at_point(internal_force, internal_point, center_of_mass.0);
 
 				#[cfg(feature = "debug")]
 				debug!("Applying internal force {:?} at point {:?} on existing force: previous= {:#?}, final= {:#?}", internal_force, internal_point, previous_parents_force, parents_force);
 			}
 		} else {
-			warn!("Collider parent points to a non-RigidBody entity");
+			warn!("The parent of an entity with `InternalForce` points to a non-`RigidBody` entity");
 		};
 	}
 }
