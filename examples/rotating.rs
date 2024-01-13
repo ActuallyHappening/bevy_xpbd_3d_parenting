@@ -96,7 +96,8 @@ fn setup(
 			},
 			// no rigidbody
 			// no external force
-			// for this specific, using internal force
+			// this collider is here for demonstration of center of mass,
+			// children do not need colliders
 			AsyncCollider(ComputedCollider::ConvexHull),
 			// internal force pushes downwards, which should rotate clockwise
 			InternalForce(Vec3::new(0., -3., 0.)),
