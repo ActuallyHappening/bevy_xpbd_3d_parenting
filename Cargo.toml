@@ -34,4 +34,5 @@ name = "rotating"
 required-features = ["bevy_xpbd_3d/async-collider"]
 
 [dev-dependencies]
+rand = "0.8.5"
 test-log = { version = "0.2.14", features = ["tracing-subscriber", "trace"] }

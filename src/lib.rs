@@ -1,6 +1,8 @@
+#![doc = include_str!("../README.md")]
+//! Implementation Details
+
 #![allow(clippy::type_complexity)]
 use bevy::ecs::schedule::{InternedScheduleLabel, ScheduleLabel};
-#[doc = include_str!("../README.md")]
 use bevy::prelude::*;
 use bevy_xpbd_3d::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -18,12 +20,16 @@ pub struct ParentingPlugin {
 	bevy_xpbd_schedule: InternedScheduleLabel,
 }
 
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub enum ParentingSystemSet {
+	PropagateInternalForces,
+}
+
 impl ParentingPlugin {
 	/// Creates a [ParentingPlugin], passing in *the same schedule you are running [bevy_xpbd_3d] on*.
 	/// E.g.
 	/// ```rust
 	/// use bevy::prelude::*;
-	///
 	/// # let mut app = App::new();
 	///
 	/// let physics_schedule = Update; // or FixedUpdate, see bevy_xpbd docs
@@ -46,7 +52,7 @@ impl Plugin for ParentingPlugin {
 			.add_systems(
 				self.bevy_xpbd_schedule,
 				(
-					apply_internal_forces,
+					propagate_internal_forces,
 					// #[cfg(feature = "debug")]
 					// helper_warnings,
 				)
@@ -85,8 +91,11 @@ impl InternalForce {
 }
 
 /// Mutates parent's [`ExternalForce`] component depending on it's
-/// children that are not [`RigidBody`]'s but have an [`InternalForce`] component
-fn apply_internal_forces(
+/// children that are not [`RigidBody`]'s but have an [`InternalForce`] component.
+/// 
+/// This is automatically scheduled in [ParentingPlugin] but is public so
+/// that end users can manually schedule this whenever they want.
+pub fn propagate_internal_forces(
 	mut parents: Query<(&mut ExternalForce, &CenterOfMass, &GlobalTransform), With<RigidBody>>,
 	children: Query<
 		(&Parent, &InternalForce, &GlobalTransform),
@@ -107,14 +116,24 @@ fn apply_internal_forces(
 				let internal_force = internal_quat.mul_vec3(internal_force.0);
 				let internal_point = parent_child_transform.translation;
 
-				#[cfg(feature = "debug")]
 				let previous_parents_force = *parents_force;
+				// #[cfg(feature = "debug")]
+				// {
+				// 	if previous_parents_force.force() != Vec3::ZERO {
+				// 		warn!("Not reset, has changed: {}", parents_force.is_changed());
+				// 	}
+				// 	// assert_eq!(previous_parents_force.force(), Vec3::ZERO);
+				// }
 
 				// the meat of the whole library
 				parents_force.apply_force_at_point(internal_force, internal_point, center_of_mass.0);
+				parents_force.set_changed();
 
 				#[cfg(feature = "debug")]
-				debug!("Applying internal force {:?} at point {:?} on existing force: previous= {:#?}, final= {:#?}", internal_force, internal_point, previous_parents_force, parents_force);
+				debug!(
+					"Applying internal force {:?} at point {:?} on existing force {:?}, resulting in {:?}",
+					internal_force, internal_point, previous_parents_force, parents_force
+				);
 			}
 		} else {
 			warn!("The parent of an entity with `InternalForce` points to a non-`RigidBody` entity");
