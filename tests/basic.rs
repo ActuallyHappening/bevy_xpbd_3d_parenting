@@ -51,7 +51,12 @@ fn assert_moves_up() {
 
 	let parent = parent.id();
 	let get_parent_height = |world: &mut World| {
-		world.entity(parent).get::<Transform>().unwrap().translation.y
+		world
+			.entity(parent)
+			.get::<Transform>()
+			.unwrap()
+			.translation
+			.y
 	};
 
 	assert_eq!(get_parent_height(&mut app.world), starting_y);
@@ -66,5 +71,45 @@ fn assert_moves_up() {
 #[test]
 fn invariant_constant_external_force() {
 	let mut app = test_app("info");
-	
+
+	// let internal_force: Vec3 = Vec3::new(random(), random(), random());
+	let internal_force: Vec3 = Vec3::new(0.0, 0.0, 100.0);
+
+	// spawn parent
+	let mut parent = app.world.spawn((
+		TransformBundle::default(),
+		RigidBody::Dynamic,
+		// NB: Parent must have external force that is NOT persistent!
+		ExternalForce::ZERO.with_persistence(false),
+		Collider::capsule(1.0, 1.0),
+	));
+	// spawn child
+	parent.with_children(|parent| {
+		parent.spawn((
+			TransformBundle::default(),
+			Collider::capsule(1.0, 1.0),
+			InternalForce(internal_force),
+		));
+	});
+
+	let parent = parent.id();
+	let get_parent_external_force =
+		|world: &mut World| *world.entity(parent).get::<ExternalForce>().unwrap();
+
+	assert_eq!(
+		get_parent_external_force(&mut app.world).force(),
+		Vec3::ZERO
+	);
+
+	for _ in 0..3 {
+		app.update();
+	}
+
+	for _ in 0..10 {
+		assert_eq!(
+			get_parent_external_force(&mut app.world).force(),
+			internal_force,
+		);
+		app.update();
+	}
 }
