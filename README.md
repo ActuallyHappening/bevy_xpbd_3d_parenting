@@ -43,7 +43,7 @@ fn setup(
 		},
 		RigidBody::Dynamic,
 		// IMPORTANT: parent's external force must be non-persistent
-		// so that each frame this library can update it just after it resets
+		// so that each frame this library can update it
 		ExternalForce::ZERO.with_persistence(false),
 		// Exact collider is arbitrary
 		Collider::capsule(1.0, 1.0),
