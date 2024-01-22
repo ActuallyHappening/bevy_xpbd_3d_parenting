@@ -10,3 +10,4 @@
 !.rustfmt.toml
 !examples
 !tests
+!.cargo

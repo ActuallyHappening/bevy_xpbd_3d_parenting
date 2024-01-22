@@ -26,6 +26,15 @@ fn test_app(log_level: &str) -> App {
 	app
 }
 
+fn get<T: Component + Clone>(e: Entity) -> impl Fn(&mut World) -> T {
+	move |world| world.entity(e).get::<T>().unwrap().clone()
+}
+fn set<T: Component + Clone>(e: Entity) -> impl Fn(&mut World, T) {
+	move |world, value| {
+		world.entity_mut(e).insert(value.clone());
+	}
+}
+
 #[test]
 fn assert_moves_up() {
 	let mut app = test_app("info");
@@ -69,6 +78,35 @@ fn assert_moves_up() {
 }
 
 #[test]
+fn assert_external_forces_clear() {
+	let mut app = test_app("info");
+
+	let force = Vec3::new(0.0, 0.0, 100.0);
+	let parent = app.world.spawn((
+		TransformBundle::default(),
+		RigidBody::Dynamic,
+		ExternalForce::new(force).with_persistence(false),
+		Collider::capsule(1.0, 1.0),
+	)).id();
+
+	let get = get::<ExternalForce>(parent);
+	let set = set::<ExternalForce>(parent);
+
+	for _ in 0..3 {
+		app.update();
+	}
+
+	for i in 0..10 {
+		let current = get(&mut app.world).force();
+		#[cfg(feature = "debug")]
+		println!("i: {i}, current: {:?}", current);
+		assert_eq!(current, Vec3::ZERO);
+		set(&mut app.world, ExternalForce::new(force + Vec3::X * i as f32).with_persistence(false));
+		app.update();
+	}
+}
+
+#[test]
 fn invariant_constant_external_force() {
 	let mut app = test_app("info");
 
@@ -93,15 +131,14 @@ fn invariant_constant_external_force() {
 	});
 
 	let parent = parent.id();
-	let get_parent_external_force =
-		|world: &mut World| *world.entity(parent).get::<ExternalForce>().unwrap();
+	let get_parent_external_force = get::<ExternalForce>(parent);
 
 	assert_eq!(
 		get_parent_external_force(&mut app.world).force(),
 		Vec3::ZERO
 	);
 
-	for _ in 0..3 {
+	for _ in 0..4 {
 		app.update();
 	}
 
@@ -109,6 +146,11 @@ fn invariant_constant_external_force() {
 		assert_eq!(
 			get_parent_external_force(&mut app.world).force(),
 			internal_force,
+		);
+		#[cfg(feature = "debug")]
+		info!(
+			"Force: {:?}",
+			get_parent_external_force(&mut app.world).force()
 		);
 		app.update();
 	}
