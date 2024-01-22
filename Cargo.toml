@@ -20,7 +20,7 @@ serde = { version = "1.0.192", features = ["derive"] }
 
 [dependencies.bevy]
 version = "0.12"
-# default-features = false
+default-features = false
 # features = ["bevy_render"]
 
 [dependencies.bevy_xpbd_3d]
@@ -36,3 +36,8 @@ required-features = ["bevy_xpbd_3d/async-collider"]
 [dev-dependencies]
 rand = "0.8.5"
 test-log = { version = "0.2.14", features = ["tracing-subscriber", "trace"] }
+
+[dev-dependencies.bevy]
+version = "0.12"
+default-features = false
+features = ["bevy_pbr"]

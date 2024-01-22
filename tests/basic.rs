@@ -35,6 +35,10 @@ fn set<T: Component + Clone>(e: Entity) -> impl Fn(&mut World, T) {
 	}
 }
 
+/// This library depends heavily on other libraries,
+/// which require a few frames each to setup.
+const SETUP_ITERATIONS: u8 = 4;
+
 #[test]
 fn assert_moves_up() {
 	let mut app = test_app("info");
@@ -59,18 +63,12 @@ fn assert_moves_up() {
 	});
 
 	let parent = parent.id();
-	let get_parent_height = |world: &mut World| {
-		world
-			.entity(parent)
-			.get::<Transform>()
-			.unwrap()
-			.translation
-			.y
-	};
+	let get_parent_transform = get::<Transform>(parent);
+	let get_parent_height = |world: &mut World| get_parent_transform(world).translation.y;
 
 	assert_eq!(get_parent_height(&mut app.world), starting_y);
 
-	for _ in 0..3 {
+	for _ in 0..SETUP_ITERATIONS {
 		app.update();
 	}
 
@@ -92,7 +90,7 @@ fn assert_external_forces_clear() {
 	let get = get::<ExternalForce>(parent);
 	let set = set::<ExternalForce>(parent);
 
-	for _ in 0..3 {
+	for _ in 0..SETUP_ITERATIONS {
 		app.update();
 	}
 
@@ -138,7 +136,7 @@ fn invariant_constant_external_force() {
 		Vec3::ZERO
 	);
 
-	for _ in 0..4 {
+	for _ in 0..SETUP_ITERATIONS {
 		app.update();
 	}
 
