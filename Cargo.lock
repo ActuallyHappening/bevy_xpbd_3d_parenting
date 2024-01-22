@@ -1089,7 +1089,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_xpbd_3d_parenting"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bevy",
  "bevy_xpbd_3d",
