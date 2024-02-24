@@ -49,7 +49,8 @@ fn setup(
 	// cube
 	let mut cube = commands.spawn((
 		PbrBundle {
-			mesh: meshs.add(Mesh::from(shape::Cube { size: 1. })),
+			// mesh: meshs.add(Mesh::from(shape::Cube { size: 1. })),
+			mesh: meshs.add(Cuboid::default()),
 			material: materials.add(Color::RED.into()),
 			transform: Transform::from_xyz(0., 5., 0.),
 			..default()
@@ -67,7 +68,8 @@ fn setup(
 	cube.with_children(|cube| {
 		cube.spawn((
 			PbrBundle {
-				mesh: meshs.add(Mesh::from(shape::Cube { size: 0.5 })),
+				// mesh: meshs.add(Mesh::from(shape::Cube { size: 0.5 })),
+				mesh: meshs.add(Cuboid::default()),
 				// lighter red child
 				material: materials.add(Color::rgb(0.5, 0.0, 0.0).into()),
 				transform: Transform::from_xyz(-3.0, 0.0, 0.0),
@@ -84,10 +86,11 @@ fn setup(
 	cube.with_children(|cube| {
 		cube.spawn((
 			PbrBundle {
-				mesh: meshs.add(Mesh::from(shape::UVSphere {
-					radius: 0.5,
-					..default()
-				})),
+				// mesh: meshs.add(Mesh::from(shape::UVSphere {
+				// 	radius: 0.5,
+				// 	..default()
+				// })),
+				mesh: meshs.add(Sphere::default().mesh().uv(16, 18)),
 				// blue child
 				material: materials.add(Color::BLUE.into()),
 				// to the right a bit

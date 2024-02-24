@@ -80,3 +80,4 @@ cargo r --example rotating --features bevy_xpbd_3d/async-collider
 | Bevy | Bevy XPBD | Bevy XPBD 3D Parenting |
 | ---- | --------- | ---------------------- |
 | 0.12 | 0.3.3     | 0.1.0									|
+| 0.13 | 0.4.2		 | 0.2.0									|
