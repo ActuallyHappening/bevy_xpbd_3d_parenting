@@ -38,7 +38,7 @@ fn set<T: Component + Clone>(e: Entity) -> impl Fn(&mut World, T) {
 
 /// This library depends heavily on other libraries,
 /// which require a few frames each to setup.
-const SETUP_ITERATIONS: u8 = 4;
+const SETUP_ITERATIONS: u8 = 5;
 
 #[test]
 fn local_moves_up() {

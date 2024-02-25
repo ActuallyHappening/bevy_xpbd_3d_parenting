@@ -37,7 +37,7 @@ fn setup(
 	// cube
 	let mut cube = commands.spawn((
 		PbrBundle {
-			mesh: meshs.add(Mesh::from(Cube::default())),
+			mesh: meshs.add(Mesh::from(Cuboid::default())),
 			transform: Transform::from_xyz(0., 5., 0.),
 			..default()
 		},
@@ -53,10 +53,7 @@ fn setup(
 	cube.with_children(|cube| {
 		cube.spawn((
 			PbrBundle {
-				mesh: meshs.add(Mesh::from(shape::UVSphere {
-					radius: 0.5,
-					..default()
-				})),
+				mesh: meshs.add(Mesh::from(Sphere::new(0.5).mesh().uv(16, 32))),
 				// to the right a bit
 				transform: Transform::from_xyz(3.0, 0.0, 0.0),
 				..default()

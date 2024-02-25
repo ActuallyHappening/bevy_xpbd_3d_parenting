@@ -34,10 +34,6 @@ fn setup(
 	// ground
 	commands.spawn((
 		PbrBundle {
-			// mesh: meshs.add(Mesh::from(shape::Plane {
-			// 	size: 10.,
-			// 	..default()
-			// })),
 			mesh: meshs.add(Plane3d::default()),
 			material: materials.add(Color::BLACK),
 			..default()
@@ -50,7 +46,6 @@ fn setup(
 	// cube
 	let mut cube = commands.spawn((
 		PbrBundle {
-			// mesh: meshs.add(Mesh::from(shape::Cube { size: 1. })),
 			mesh: meshs.add(Cuboid::default()),
 			material: materials.add(Color::RED),
 			transform: Transform::from_xyz(0., 5., 0.),
@@ -87,10 +82,6 @@ fn setup(
 	cube.with_children(|cube| {
 		cube.spawn((
 			PbrBundle {
-				// mesh: meshs.add(Mesh::from(shape::UVSphere {
-				// 	radius: 0.5,
-				// 	..default()
-				// })),
 				mesh: meshs.add(Sphere::default().mesh().uv(16, 18)),
 				// blue child
 				material: materials.add(Color::BLUE),
