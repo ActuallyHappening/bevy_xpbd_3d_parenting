@@ -7,7 +7,7 @@ use utils::*;
 proptest! {
 	#[test]
 	fn global_ignores_rotation(rot1 in 0.1f32 .. 4f32, rot2 in 0.1f32 .. 4f32) {
-		let mut app = test_app("info");
+		let mut app = test_app(None);
 
 		let mut parent = app.world.spawn((
 			TransformBundle::from_transform(Transform::from_rotation(Quat::from_rotation_z(TAU / rot1))),
@@ -39,7 +39,7 @@ proptest! {
 
 	#[test]
 	fn local_factors_rotation(rot1 in 0.1f32 .. 4f32, rot2 in 0.1f32 .. 4f32) {
-		let mut app = test_app("info");
+		let mut app = test_app(None);
 
 		let mut parent = app.world.spawn((
 			TransformBundle::from_transform(Transform::from_rotation(Quat::from_rotation_z(TAU / rot1))),

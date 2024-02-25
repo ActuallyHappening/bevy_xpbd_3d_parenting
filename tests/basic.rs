@@ -5,7 +5,7 @@ use utils::*;
 
 #[test]
 fn local_moves_up() {
-	let mut app = test_app("info");
+	let mut app = test_app(None);
 
 	let starting_y = random::<f32>() * 100.;
 
@@ -41,7 +41,7 @@ fn local_moves_up() {
 
 #[test]
 fn external_forces_clear() {
-	let mut app = test_app("info");
+	let mut app = test_app(None);
 
 	let force = Vec3::new(0.0, 0.0, 100.0);
 	let parent = app
@@ -74,9 +74,10 @@ fn external_forces_clear() {
 	}
 }
 
+#[ignore = "bevy_xpbd actually clears forces properly, which was not observed in previous versions"]
 #[test]
 fn invariant_constant_external_force() {
-	let mut app = test_app("info");
+	let mut app = test_app(None);
 
 	// let internal_force: Vec3 = Vec3::new(random(), random(), random());
 	let internal_force: Vec3 = Vec3::new(0.0, 0.0, 100.0);
@@ -94,7 +95,7 @@ fn invariant_constant_external_force() {
 		parent.spawn((
 			TransformBundle::default(),
 			Collider::capsule(1.0, 1.0),
-			InternalForce::new_local(internal_force),
+			InternalForce::new_global(internal_force),
 		));
 	});
 
@@ -106,7 +107,7 @@ fn invariant_constant_external_force() {
 		Vec3::ZERO
 	);
 
-	for _ in 0..SETUP_ITERATIONS {
+	for _ in 0.. SETUP_ITERATIONS {
 		app.update();
 	}
 

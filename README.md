@@ -13,6 +13,11 @@ default-features = false
 This library exports a single `Plugin`, `ParentingPlugin`, which must be added
 to the app with the same `Schedule` as `bevy_xpbd_3d`'s `PhysicsPlugin`.
 
+Then, any systems that mutate these `InternalForce`s should be schedule before:
+```rust,no_run
+bevy_xpbd_3d_parenting::ParentingSystemSet::ManuallyClearForces;
+```
+
 Parents must have:
 - `RigidBody`
 	- `RigidBody::Dynamic` or nothing will move
