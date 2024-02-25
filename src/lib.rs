@@ -181,7 +181,7 @@ impl InternalForce {
 	/// direction, right is in the +X direction, and up is in the +Y direction.
 	///
 	/// This is a wrapper around [Self::new_local]
-	pub fn new_forward_right_up(forward: f32, right: f32, up: f32) -> Self {
+	pub fn new_local_forward_right_up(forward: f32, right: f32, up: f32) -> Self {
 		Self::new_local(Vec3::new(right, up, -forward))
 	}
 
