@@ -1,4 +1,8 @@
 //! Demonstrates how two global [InternalForce]s can counteract each other.
+//!
+//! It is expected that the cube will stay in place, with the two children
+//! perfectly cancelling out. If done in local space, this would result in
+//! erratic movement, as the forces would constantly change direction.
 
 use bevy::prelude::*;
 use bevy_xpbd_3d::prelude::*;

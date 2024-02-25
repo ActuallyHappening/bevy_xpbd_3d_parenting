@@ -209,11 +209,11 @@ mod systems {
 		pub(super) fn propagate_internal_forces(
 			mut parents: Query<(&mut ExternalForce, &CenterOfMass, &GlobalTransform), With<RigidBody>>,
 			children: Query<
-				(&Parent, &InternalForce, &GlobalTransform),
+				(&Parent, &InternalForce, &Transform),
 				(Without<RigidBody>, Without<ExternalForce>),
 			>,
 		) {
-			for (collider_parent, internal_force, child_global_transform) in children.iter() {
+			for (collider_parent, internal_force, child_relative_transform) in children.iter() {
 				if let Ok((mut parents_force, center_of_mass, parent_global_transform)) =
 					parents.get_mut(collider_parent.get())
 				{
@@ -221,14 +221,13 @@ mod systems {
 						warn!("A child entity (with an `InternalForce` but no `RigidBody`) is a child of a RigidBody entity with a persistent ExternalForce. \
 								This is not supported, as child entities' `ExternalForce` is updated every (physics) frame by the `ParentingPlugin`");
 					} else {
-						let parent_child_transform =
-							child_global_transform.reparented_to(parent_global_transform);
-						let internal_point = parent_child_transform.translation;
+						let internal_point = child_relative_transform.translation;
 
 						let internal_force = match internal_force {
 							InternalForce::Global { force, strength } => *force * *strength,
 							InternalForce::Local { force, strength } => {
-								parent_child_transform.rotation.mul_vec3(*force * *strength)
+								let parent_space_force = child_relative_transform.rotation.mul_vec3(*force * *strength);
+								parent_global_transform.compute_transform().rotation.mul_vec3(parent_space_force)
 							}
 						};
 
