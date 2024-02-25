@@ -32,8 +32,6 @@ features = ["3d", "f32", "debug-plugin", "parallel"]
 
 [dev-dependencies]
 proptest = "1.4.0"
-rand = "0.8.5"
-test-log = { version = "0.2.14", features = ["tracing-subscriber", "trace"] }
 
 [dev-dependencies.bevy_xpbd_3d]
 version = "0.4.2"
