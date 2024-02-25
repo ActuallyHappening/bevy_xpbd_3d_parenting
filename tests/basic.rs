@@ -3,40 +3,42 @@ use rand::random;
 mod utils;
 use utils::*;
 
-#[test]
-fn local_moves_up() {
-	let mut app = test_app(None);
+proptest! {
+	#[test]
+	fn local_moves_up(starting_y in 0.0f32 .. 100.0f32) {
+		let mut app = test_app(None);
 
-	let starting_y = random::<f32>() * 100.;
-
-	// spawn parent
-	let mut parent = app.world.spawn((
-		TransformBundle::from_transform(Transform::from_translation(Vec3::Y * starting_y)),
-		RigidBody::Dynamic,
-		// NB: Parent must have external force that is NOT persistent!
-		ExternalForce::ZERO.with_persistence(false),
-		Collider::capsule(1.0, 1.0),
-	));
-	// spawn child
-	parent.with_children(|parent| {
-		parent.spawn((
-			TransformBundle::default(),
+		// spawn parent
+		let mut parent = app.world.spawn((
+			TransformBundle::from_transform(Transform::from_translation(Vec3::Y * starting_y)),
+			RigidBody::Dynamic,
+			// NB: Parent must have external force that is NOT persistent!
+			ExternalForce::ZERO.with_persistence(false),
 			Collider::capsule(1.0, 1.0),
-			InternalForce::new_local(Vec3::new(0., 300.0, 0.)),
 		));
-	});
+		// spawn child
+		parent.with_children(|parent| {
+			parent.spawn((
+				TransformBundle::default(),
+				Collider::capsule(1.0, 1.0),
+				InternalForce::new_local(Vec3::new(0., 300.0, 0.)),
+			));
+		});
 
-	let parent = parent.id();
-	let get_parent_transform = get::<Transform>(parent);
-	let get_parent_height = |world: &mut World| get_parent_transform(world).translation.y;
+		let parent = parent.id();
+		let get_parent_transform = get::<Transform>(parent);
+		let get_parent_height = |world: &mut World| get_parent_transform(world).translation.y;
 
-	assert_eq!(get_parent_height(&mut app.world), starting_y);
+		assert_eq!(get_parent_height(&mut app.world), starting_y);
 
-	for _ in 0..SETUP_ITERATIONS {
+		for _ in 0..SETUP_ITERATIONS {
+			app.update();
+		}
+
 		app.update();
-	}
 
-	assert!(get_parent_height(&mut app.world) > starting_y);
+		assert!(get_parent_height(&mut app.world) > starting_y);
+	}
 }
 
 #[test]
@@ -107,7 +109,7 @@ fn invariant_constant_external_force() {
 		Vec3::ZERO
 	);
 
-	for _ in 0.. SETUP_ITERATIONS {
+	for _ in 0..SETUP_ITERATIONS {
 		app.update();
 	}
 
