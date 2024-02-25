@@ -5,7 +5,7 @@ Allows children of a `bevy_xpbd_3d` `RigidBody` to exert forces on their parents
 ```toml
 # Use the latest release of bevy_xpbd_3d_parenting
 [dependencies.bevy_xpbd_3d_parenting]
-version = "0.1"
+version = "0.2"
 default-features = false
 ```
 
