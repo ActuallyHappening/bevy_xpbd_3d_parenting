@@ -104,7 +104,7 @@ fn setup(
 			// children do not need colliders
 			AsyncCollider(ComputedCollider::ConvexHull),
 			// internal force pushes downwards, which should rotate clockwise
-			InternalForce(Vec3::new(0., -3., 0.)),
+			InternalForce::new_forward_right_up(0., 0., -3.0),
 		));
 	});
 }

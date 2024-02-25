@@ -37,7 +37,7 @@ fn setup(
 	// cube
 	let mut cube = commands.spawn((
 		PbrBundle {
-			mesh: meshs.add(Mesh::from(shape::Cube { size: 1. })),
+			mesh: meshs.add(Mesh::from(Cube::default())),
 			transform: Transform::from_xyz(0., 5., 0.),
 			..default()
 		},
@@ -64,7 +64,7 @@ fn setup(
 			// no rigidbody
 			// no external force
 			// internal force pushes downwards, which should rotate clockwise
-			InternalForce(Vec3::new(0., -3., 0.)),
+			InternalForce::new_local(Vec3::new(0., -3., 0.)),
 		));
 	});
 }

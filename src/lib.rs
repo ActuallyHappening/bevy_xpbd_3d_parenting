@@ -198,18 +198,6 @@ impl InternalForce {
 	pub fn compute_naive_force(&self) -> Vec3 {
 		self.get_naive_force() * self.get_strength()
 	}
-
-	/// Returns a non-naive [Vec3] representing the global force represented by the [InternalForce].
-	/// This takes into account the strength.
-	pub fn compute_global_force(&self, parent_transform: &GlobalTransform) -> Vec3 {
-		match self {
-			InternalForce::Global { .. } => self.compute_naive_force(),
-			InternalForce::Local { .. } => parent_transform
-				.compute_transform()
-				.rotation
-				.mul_vec3(self.compute_naive_force()),
-		}
-	}
 }
 
 mod systems {
@@ -235,29 +223,29 @@ mod systems {
 					} else {
 						let parent_child_transform =
 							child_global_transform.reparented_to(parent_global_transform);
-
-						let internal_quat = parent_child_transform.rotation;
-						let internal_force = internal_quat.mul_vec3(internal_force.0);
 						let internal_point = parent_child_transform.translation;
 
+						let internal_force = match internal_force {
+							InternalForce::Global { force, strength } => *force * *strength,
+							InternalForce::Local { force, strength } => {
+								parent_child_transform.rotation.mul_vec3(*force * *strength)
+							}
+						};
+
+						#[cfg(feature = "debug")]
 						let previous_parents_force = *parents_force;
-						// #[cfg(feature = "debug")]
-						// {
-						// 	if previous_parents_force.force() != Vec3::ZERO {
-						// 		warn!("Not reset, has changed: {}", parents_force.is_changed());
-						// 	}
-						// 	// assert_eq!(previous_parents_force.force(), Vec3::ZERO);
-						// }
 
 						// the meat of the whole library
 						parents_force.apply_force_at_point(internal_force, internal_point, center_of_mass.0);
+
+						#[cfg(feature = "debug")]
 						parents_force.set_changed();
 
 						#[cfg(feature = "debug")]
 						debug!(
-						"Applying internal force {:?} at point {:?} on existing force {:?}, resulting in {:?}",
-						internal_force, internal_point, previous_parents_force, parents_force
-					);
+							"Applying internal force {:?} at point {:?} on existing force {:?}, resulting in {:?}",
+							internal_force, internal_point, previous_parents_force, parents_force
+						);
 					}
 				} else {
 					warn!("The parent of an entity with `InternalForce` points to a non-`RigidBody` entity");

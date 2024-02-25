@@ -41,7 +41,7 @@ fn set<T: Component + Clone>(e: Entity) -> impl Fn(&mut World, T) {
 const SETUP_ITERATIONS: u8 = 4;
 
 #[test]
-fn assert_moves_up() {
+fn local_moves_up() {
 	let mut app = test_app("info");
 
 	let starting_y = random::<f32>() * 100.;
@@ -59,7 +59,7 @@ fn assert_moves_up() {
 		parent.spawn((
 			TransformBundle::default(),
 			Collider::capsule(1.0, 1.0),
-			InternalForce(Vec3::new(0., 300.0, 0.)),
+			InternalForce::new_local(Vec3::new(0., 300.0, 0.)),
 		));
 	});
 
@@ -77,16 +77,19 @@ fn assert_moves_up() {
 }
 
 #[test]
-fn assert_external_forces_clear() {
+fn external_forces_clear() {
 	let mut app = test_app("info");
 
 	let force = Vec3::new(0.0, 0.0, 100.0);
-	let parent = app.world.spawn((
-		TransformBundle::default(),
-		RigidBody::Dynamic,
-		ExternalForce::new(force).with_persistence(false),
-		Collider::capsule(1.0, 1.0),
-	)).id();
+	let parent = app
+		.world
+		.spawn((
+			TransformBundle::default(),
+			RigidBody::Dynamic,
+			ExternalForce::new(force).with_persistence(false),
+			Collider::capsule(1.0, 1.0),
+		))
+		.id();
 
 	let get = get::<ExternalForce>(parent);
 	let set = set::<ExternalForce>(parent);
@@ -100,7 +103,10 @@ fn assert_external_forces_clear() {
 		#[cfg(feature = "debug")]
 		println!("i: {i}, current: {:?}", current);
 		assert_eq!(current, Vec3::ZERO);
-		set(&mut app.world, ExternalForce::new(force + Vec3::X * i as f32).with_persistence(false));
+		set(
+			&mut app.world,
+			ExternalForce::new(force + Vec3::X * i as f32).with_persistence(false),
+		);
 		app.update();
 	}
 }
@@ -125,7 +131,7 @@ fn invariant_constant_external_force() {
 		parent.spawn((
 			TransformBundle::default(),
 			Collider::capsule(1.0, 1.0),
-			InternalForce(internal_force),
+			InternalForce::new_local(internal_force),
 		));
 	});
 
