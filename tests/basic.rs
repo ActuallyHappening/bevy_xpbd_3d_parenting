@@ -1,5 +1,3 @@
-use rand::random;
-
 mod utils;
 use utils::*;
 

@@ -43,4 +43,5 @@ pub fn set<T: Component + Clone>(e: Entity) -> impl Fn(&mut World, T) {
 
 /// This library depends heavily on other libraries,
 /// which require a few frames each to setup.
+/// This value will always be at least 1
 pub const SETUP_ITERATIONS: u8 = 1;
