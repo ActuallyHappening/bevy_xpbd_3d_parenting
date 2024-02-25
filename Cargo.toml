@@ -23,11 +23,9 @@ serde = { version = "1.0.192", features = ["derive"] }
 [dependencies.bevy]
 version = "0.13"
 default-features = false
-# features = ["bevy_render"]
 
 [dependencies.bevy_xpbd_3d]
 version = "0.4.2"
-# git = "https://github.com/Jondolf/bevy_xpbd.git"
 default-features = false
 features = ["3d", "f32", "debug-plugin", "parallel"]
 
@@ -39,7 +37,6 @@ test-log = { version = "0.2.14", features = ["tracing-subscriber", "trace"] }
 
 [dev-dependencies.bevy_xpbd_3d]
 version = "0.4.2"
-# git = "https://github.com/Jondolf/bevy_xpbd.git"
 default-features = false
 features = [
 	"3d",
