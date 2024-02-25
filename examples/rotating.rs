@@ -34,11 +34,12 @@ fn setup(
 	// ground
 	commands.spawn((
 		PbrBundle {
-			mesh: meshs.add(Mesh::from(shape::Plane {
-				size: 10.,
-				..default()
-			})),
-			material: materials.add(Color::BLACK.into()),
+			// mesh: meshs.add(Mesh::from(shape::Plane {
+			// 	size: 10.,
+			// 	..default()
+			// })),
+			mesh: meshs.add(Plane3d::default()),
+			material: materials.add(Color::BLACK),
 			..default()
 		},
 		RigidBody::Static,
@@ -51,7 +52,7 @@ fn setup(
 		PbrBundle {
 			// mesh: meshs.add(Mesh::from(shape::Cube { size: 1. })),
 			mesh: meshs.add(Cuboid::default()),
-			material: materials.add(Color::RED.into()),
+			material: materials.add(Color::RED),
 			transform: Transform::from_xyz(0., 5., 0.),
 			..default()
 		},
@@ -71,7 +72,7 @@ fn setup(
 				// mesh: meshs.add(Mesh::from(shape::Cube { size: 0.5 })),
 				mesh: meshs.add(Cuboid::default()),
 				// lighter red child
-				material: materials.add(Color::rgb(0.5, 0.0, 0.0).into()),
+				material: materials.add(Color::rgb(0.5, 0.0, 0.0)),
 				transform: Transform::from_xyz(-3.0, 0.0, 0.0),
 				..default()
 			},
@@ -92,7 +93,7 @@ fn setup(
 				// })),
 				mesh: meshs.add(Sphere::default().mesh().uv(16, 18)),
 				// blue child
-				material: materials.add(Color::BLUE.into()),
+				material: materials.add(Color::BLUE),
 				// to the right a bit
 				transform: Transform::from_xyz(3.0, 0.0, 0.0),
 				..default()

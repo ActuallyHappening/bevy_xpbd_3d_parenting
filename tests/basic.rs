@@ -18,6 +18,7 @@ fn test_app(log_level: &str) -> App {
 				log_level = log_level
 			),
 			level: Level::INFO,
+			update_subscriber: None,
 		},
 		bevy_xpbd_3d::prelude::PhysicsPlugins::new(Update),
 		bevy_xpbd_3d_parenting::ParentingPlugin::new(Update),

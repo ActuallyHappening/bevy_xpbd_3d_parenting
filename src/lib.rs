@@ -2,6 +2,8 @@
 //! Implementation Details
 
 #![allow(clippy::type_complexity)]
+use std::ops::{Deref, DerefMut};
+
 use bevy::ecs::schedule::{InternedScheduleLabel, ScheduleLabel};
 use bevy::prelude::*;
 use bevy_xpbd_3d::prelude::*;
@@ -70,29 +72,143 @@ impl Plugin for ParentingPlugin {
 }
 
 /// Synced with parents
-#[derive(
-	Reflect, Component, Debug, Clone, Copy, Deref, DerefMut, Serialize, Deserialize, Default,
-)]
+#[derive(Reflect, Component, Debug, Clone, Copy, Serialize, Deserialize)]
 #[reflect(Component)]
-pub struct InternalForce(pub Vec3);
+pub enum InternalForce {
+	/// A force that is applied in the global space of the parent entity.
+	Global { force: Vec3, strength: f32 },
+	/// A force that is applied in the local space of the parent entity,
+	/// relative to the child entity.
+	Local { force: Vec3, strength: f32 },
+}
+
+impl Default for InternalForce {
+	fn default() -> Self {
+		InternalForce::DEFAULT
+	}
+}
+
+impl Deref for InternalForce {
+	type Target = Vec3;
+
+	fn deref(&self) -> &Self::Target {
+		match self {
+			InternalForce::Global { force, .. } => force,
+			InternalForce::Local { force, .. } => force,
+		}
+	}
+}
+
+impl DerefMut for InternalForce {
+	fn deref_mut(&mut self) -> &mut Self::Target {
+		match self {
+			InternalForce::Global { force, .. } => force,
+			InternalForce::Local { force, .. } => force,
+		}
+	}
+}
 
 impl InternalForce {
-	pub const ZERO: Self = InternalForce(Vec3::ZERO);
+	pub const ZERO: Self = InternalForce::Local {
+		force: Vec3::ZERO,
+		strength: 1.0,
+	};
 
-	pub fn inner(&self) -> Vec3 {
-		self.0
+	pub const DEFAULT: Self = Self::ZERO;
+
+	pub const fn default() -> Self {
+		Self::DEFAULT
 	}
 
-	pub fn get(&self) -> Vec3 {
-		self.0
+	pub fn get_strength(&self) -> f32 {
+		match self {
+			InternalForce::Global { strength, .. } => *strength,
+			InternalForce::Local { strength, .. } => *strength,
+		}
 	}
 
-	pub fn into_inner(self) -> Vec3 {
-		self.0
+	pub fn get_mut_strength(&mut self) -> &mut f32 {
+		match self {
+			InternalForce::Global { strength, .. } => strength,
+			InternalForce::Local { strength, .. } => strength,
+		}
 	}
 
-	pub fn set(&mut self, value: Vec3) {
-		self.0 = value;
+	pub fn set_strength(&mut self, strength: f32) {
+		match self {
+			InternalForce::Global { strength: s, .. } => *s = strength,
+			InternalForce::Local { strength: s, .. } => *s = strength,
+		}
+	}
+
+	pub fn with_strength(mut self, strength: f32) -> Self {
+		self.set_strength(strength);
+		self
+	}
+
+	/// Creates an [InternalForce] that operates in the local space of the parent entity.
+	/// By default, the strength is 1.0.
+	///
+	/// Also see [Self::new_forward_right_up]
+	pub fn new_local(force: Vec3) -> Self {
+		InternalForce::Local {
+			force,
+			strength: 1.0,
+		}
+	}
+
+	/// See [InternalForce::new_local]
+	pub fn new_relative(force: Vec3) -> Self {
+		Self::new_local(force)
+	}
+
+	/// Creates an [InternalForce] that operates in the global space of the parent entity.
+	/// By default, the strength is 1.0.
+	pub fn new_global(force: Vec3) -> Self {
+		InternalForce::Global {
+			force,
+			strength: 1.0,
+		}
+	}
+
+	/// See [InternalForce::new_global]
+	pub fn new_absolute(force: Vec3) -> Self {
+		Self::new_global(force)
+	}
+
+	/// Creates an [InternalForce] that operates in the local space of the parent entity,
+	/// with the force being forward, right, and up. This assumes forward is in the -Z
+	/// direction, right is in the +X direction, and up is in the +Y direction.
+	///
+	/// This is a wrapper around [Self::new_local]
+	pub fn new_forward_right_up(forward: f32, right: f32, up: f32) -> Self {
+		Self::new_local(Vec3::new(right, up, -forward))
+	}
+
+	/// Returns a [Vec3] representing the force, *without* the strength applied.
+	/// This is naive because it may be global or local.
+	/// To work out if the force is global or local, `match` on the `InternalForce`.
+	pub fn get_naive_force(&self) -> Vec3 {
+		**self
+	}
+
+	/// Returns a [Vec3] representing the force, *with* the strength applied.
+	/// This is naive because it may be global or local.
+	/// To work out if the force is global or local, `match` on the `InternalForce`.
+	pub fn compute_naive_force(&self) -> Vec3 {
+		self.get_naive_force() * self.get_strength()
+	}
+
+	/// Returns a non-naive [Vec3] representing the global force represented by the [InternalForce].
+	/// This takes into account the strength.
+	pub fn compute_global_force(&self, parent_transform: &GlobalTransform) -> Vec3 {
+		match self {
+			InternalForce::Global { .. } => self.compute_naive_force(),
+			InternalForce::Local { .. } => parent_transform
+				.compute_transform()
+				.rotation
+				.mul_vec3(self.compute_naive_force()),
+		}
 	}
 }
 
@@ -101,9 +217,7 @@ mod systems {
 	impl super::ParentingPlugin {
 		/// Mutates parent's [`ExternalForce`] component depending on it's
 		/// children that are not [`RigidBody`]'s but have an [`InternalForce`] component.
-		///
-		/// This is automatically scheduled in [ParentingPlugin] but is public so
-		/// that end users can manually schedule this whenever they want.
+		/// This is automatically scheduled in [ParentingPlugin]
 		pub(super) fn propagate_internal_forces(
 			mut parents: Query<(&mut ExternalForce, &CenterOfMass, &GlobalTransform), With<RigidBody>>,
 			children: Query<
@@ -155,7 +269,7 @@ mod systems {
 			for mut external_force in external_forces.iter_mut() {
 				if !external_force.persistent {
 					#[cfg(feature = "debug")]
-					trace!("Clearing external force {:?}", external_force);
+					trace!("Manually clearing external force {:?}", external_force);
 					external_force.clear();
 				}
 			}
