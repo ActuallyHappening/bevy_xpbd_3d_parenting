@@ -9,8 +9,34 @@ version = "0.1"
 default-features = false
 ```
 
+## Theoretical usage
+This library exports a single `Plugin`, `ParentingPlugin`, which must be added
+to the app with the same `Schedule` as `bevy_xpbd_3d`'s `PhysicsPlugin`.
+
+Parents must have:
+- `RigidBody`
+	- `RigidBody::Dynamic` or nothing will move
+	- `Collider` so that bevy_xpbd works
+- `ExternalForce` *with `persistence` set to `false`* (will warn using `tracing` if not upheld)
+- `TransformBundle` for position in space:
+	- `Transform`
+	- `GlobalTransform`
+
+Children must have:
+- `RigidBody`, see parent
+- `TransformBundle`, see parent
+- **`InternalForce` to exert forces on the parent**
+
+
+### Types of Internal Forces
+Internal forces come in two flavours, `InternalForce::Global` and `InternalForce::Local`.
+Local `InternalForce`s are in the local space of the parent, while global `InternalForce`s are in the global space.
+This means local `InternalForce`s will rotate with the parent, while global `InternalForce`s will not.
+
+Check out the [global_versus_local](./examples/global_versus_local.rs) example for a demonstration.
+
 ## Quick usage example:
-See the (examples)[./examples] for complete examples.
+See the [examples](./examples) for complete examples.
 ```rust,no_run
 // Shows a basic usage of [InternalForce].
 
@@ -71,6 +97,7 @@ fn setup(
 Run:
 ```sh
 cargo r --example rotating --features bevy_xpbd_3d/async-collider
+cargo r --example global_versus_local --features bevy_xpbd_3d/async-collider
 ```
 
 ## Compatibility table
@@ -78,3 +105,8 @@ cargo r --example rotating --features bevy_xpbd_3d/async-collider
 | ---- | --------- | ---------------------- |
 | 0.12 | 0.3.3     | 0.1.0									|
 | 0.13 | 0.4.2		 | 0.2.0									|
+
+## Developing notes
+`cargo t` for testing, which runs:
+- Every combination of feature flags
+- A variety of `proptest`s

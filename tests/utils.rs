@@ -40,4 +40,4 @@ pub fn set<T: Component + Clone>(e: Entity) -> impl Fn(&mut World, T) {
 
 /// This library depends heavily on other libraries,
 /// which require a few frames each to setup.
-pub const SETUP_ITERATIONS: u8 = 8;
+pub const SETUP_ITERATIONS: u8 = 10;
