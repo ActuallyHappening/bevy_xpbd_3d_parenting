@@ -1,18 +1,16 @@
-//! Shows a basic usage of [InternalForce].
-//! This spawns a center red cube, and two children on either side.
-//!
-//! The child on the right has an internal force facing downwards, which should rotate the parent clockwise.
-//!
-//! Note also that this system is not balanced as is clearly seen, so center of mass is taken into account
+//! Shows the difference between an [InternalForce::Global] and [InternalForce::Local].
 
-use bevy::prelude::*;
+use bevy::{log::LogPlugin, prelude::*};
 use bevy_xpbd_3d::prelude::*;
 use bevy_xpbd_3d_parenting::InternalForce;
 
 fn main() {
 	App::new()
 		.add_plugins((
-			DefaultPlugins,
+			DefaultPlugins.set(LogPlugin {
+				filter: "bevy_xpbd_3d_parenting=trace,bevy_xpbd_3d=info".into(),
+				..default()
+			}),
 			PhysicsPlugins::new(Update),
 			bevy_xpbd_3d_parenting::prelude::ParentingPlugin::new(Update),
 		))
@@ -64,16 +62,12 @@ fn setup(
 	cube.with_children(|cube| {
 		cube.spawn((
 			PbrBundle {
-				// mesh: meshs.add(Mesh::from(shape::Cube { size: 0.5 })),
 				mesh: meshs.add(Cuboid::default()),
 				// lighter red child
 				material: materials.add(Color::rgb(0.5, 0.0, 0.0)),
 				transform: Transform::from_xyz(-3.0, 0.0, 0.0),
 				..default()
 			},
-			// no rigidbody
-			// no external force
-			// for this specific, child no internal force
 			Collider::capsule(0.5, 0.5),
 		));
 	});
@@ -89,13 +83,10 @@ fn setup(
 				transform: Transform::from_xyz(3.0, 0.0, 0.0),
 				..default()
 			},
-			// no rigidbody
-			// no external force
-			// this collider is here for demonstration of center of mass,
-			// children do not need colliders
 			AsyncCollider(ComputedCollider::ConvexHull),
-			// ! internal force pushes downwards, which should rotate clockwise
-			InternalForce::new_forward_right_up(0., 0., -3.0),
+			// ! This pushes downwards in global space, meaning it will pull the whole
+			// ! structure downward regardless of local rotation.
+			InternalForce::new_global(Vec3::new(0., -1.0, 0.0)),
 		));
 	});
 }

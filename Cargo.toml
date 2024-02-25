@@ -29,11 +29,9 @@ version = "0.4.2"
 default-features = false
 features = ["3d", "f32", "debug-plugin", "parallel"]
 
-[[example]]
-name = "rotating"
-required-features = ["bevy_xpbd_3d/async-collider"]
 
 [dev-dependencies]
+proptest = "1.4.0"
 rand = "0.8.5"
 test-log = { version = "0.2.14", features = ["tracing-subscriber", "trace"] }
 
@@ -41,7 +39,22 @@ test-log = { version = "0.2.14", features = ["tracing-subscriber", "trace"] }
 version = "0.4.2"
 # git = "https://github.com/Jondolf/bevy_xpbd.git"
 default-features = false
-features = ["3d", "f32", "parry-f32", "debug-plugin", "parallel", "default-collider"]
+features = [
+	"3d",
+	"f32",
+	"parry-f32",
+	"debug-plugin",
+	"parallel",
+	"default-collider",
+]
 
 [dev-dependencies.bevy]
 version = "0.13"
+
+[[example]]
+name = "rotating"
+required-features = ["bevy_xpbd_3d/async-collider"]
+
+[[example]]
+name = "global_versus_local"
+required-features = ["bevy_xpbd_3d/async-collider"]
